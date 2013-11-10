@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:beans="http://www.springframework.org/schema/beans" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:c="http://www.springframework.org/schema/c"
+	xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+<!-- 	<http pattern="/api/ucloud/os*/**" security="none"/> -->
+	
+	<http auto-config="true" use-expressions="true">
+		<intercept-url pattern="/main" access="permitAll" />
+		<intercept-url pattern="/user" access="permitAll" />
+		<intercept-url pattern="/emart/**" access="isAuthenticated()" />
+		<intercept-url pattern="/fish/**" access="isAuthenticated()" />
+		<intercept-url pattern="/meat/**" access="isAuthenticated()" />
+		<intercept-url pattern="/fruit/**" access="isAuthenticated()" />
+		<intercept-url pattern="/home/**" access="isAuthenticated()" />
+		
+		<form-login 
+			login-page="/main" 
+			login-processing-url="/j_spring_security_check"
+			authentication-failure-url="/main" 
+			default-target-url="/emart" />
+		
+		<logout 
+			logout-url="/j_spring_security_logout"
+			logout-success-url="/main" 
+			invalidate-session="true"/>
+		
+	</http>
+	
+	<authentication-manager alias="authenticationManager">
+		<authentication-provider>
+			<password-encoder ref="passwordEncoder" />
+			<jdbc-user-service id="userService" data-source-ref="dataSource"
+				users-by-username-query="SELECT username AS username, passwd AS password, 1 FROM User WHERE username=?"
+				authorities-by-username-query="SELECT username AS username, role FROM User WHERE username=?"/>
+		</authentication-provider>
+	</authentication-manager>
+
+	<beans:bean id="passwordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" c:strength="15" />
+	
+</beans:beans>
